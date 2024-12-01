@@ -22,6 +22,7 @@ public class CombinedDataController {
             binanceData.remove(0);
         }
         binanceData.add(record);
+
     }
 
     public void addMEXCData(MEXCRecord record) {
