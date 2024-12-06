@@ -45,6 +45,7 @@ public class PriceController {
     @NoArgsConstructor
     public static class PriceData {
         private String symbol;
+
         private String exchange;
         private double buyPrice;
         private double sellPrice;
