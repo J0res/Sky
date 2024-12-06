@@ -1,72 +1,54 @@
 package kg.com.api_salamat.controller;
 
-import org.springframework.stereotype.Controller;
+import kg.com.api_salamat.service.TelegramService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.concurrent.ConcurrentHashMap;
+
+@RestController
 public class PriceController {
 
-    // Метод для обновления данных с OKX
-    public void updateOKXData(String symbol, Double avgBidPrice, Double avgAskPrice,
-                              Double bidSumUSDT, Double askSumUSDT,
-                              Double high24h, Double low24h, Double volume24hInUSDT) {
-        // Обработка данных для OKX
-        if (symbol != null) {
-            System.out.println("OKX: " + symbol);
-        }
-        if (avgBidPrice != null) {
-            System.out.println("Average Bid Price: " + avgBidPrice);
-        }
-        if (avgAskPrice != null) {
-            System.out.println("Average Ask Price: " + avgAskPrice);
-        }
-        if (bidSumUSDT != null) {
-            System.out.println("Bid Total USDT: " + bidSumUSDT);
-        }
-        if (askSumUSDT != null) {
-            System.out.println("Ask Total USDT: " + askSumUSDT);
-        }
-        if (high24h != null) {
-            System.out.println("24h High: " + high24h);
-        }
-        if (low24h != null) {
-            System.out.println("24h Low: " + low24h);
-        }
-        if (volume24hInUSDT != null) {
-            System.out.println("24h Volume (USDT): " + volume24hInUSDT);
-        }
+    private final ConcurrentHashMap<String, PriceData> priceDataMap = new ConcurrentHashMap<>();
+    private final TelegramService telegramService;
+
+    public PriceController(TelegramService telegramService) {
+        this.telegramService = telegramService;
     }
 
-    // Метод для обновления данных с MEXC
-    public void updateMEXCData(String symbol, Double avgBidPrice, Double avgAskPrice,
-                               Double bidSumUSDT, Double askSumUSDT,
-                               Double high24h, Double low24h, Double volume24hInUSDT) {
-        // Аналогичная обработка данных для MEXC
-        if (symbol != null) {
-            System.out.println("MEXC: " + symbol);
-        }
-        // Аналогично выводим другие данные
+    public void updateData(String symbol, String exchange, double buyPrice, double sellPrice, double profit, double spread) {
+        PriceData data = new PriceData(symbol, exchange, buyPrice, sellPrice, profit, spread);
+        priceDataMap.put(symbol, data);
+
+        // Формируем сообщение и отправляем в Telegram
+        String message = String.format(
+                "💸 *%s -> Binance | %s*\n\n" +
+                        "📈 *Покупка:*\nОбъем: %.2f USDT\nЦена: %.6f\n\n" +
+                        "📉 *Продажа:*\nОбъем: %.2f FUN\nЦена: %.6f\n\n" +
+                        "💰 *Прибыль:* %.2f USDT\n📊 *Спред:* %.2f%%\n",
+                exchange, symbol, buyPrice, buyPrice / 0.0001, sellPrice, sellPrice / 0.0001, profit, spread
+        );
+
+        telegramService.sendMessage(message);
     }
 
-    // Метод для обновления данных с Bitget
-    public void updateBitgetData(String symbol, Double avgBidPrice, Double avgAskPrice,
-                                 Double bidSumUSDT, Double askSumUSDT,
-                                 Double high24h, Double low24h, Double volume24hInUSDT) {
-        // Обработка данных для Bitget
-        if (symbol != null) {
-            System.out.println("Bitget: " + symbol);
-        }
-        // Аналогичные выводы для других данных
+    @GetMapping("/average-prices")
+    public ConcurrentHashMap<String, PriceData> getAveragePrices() {
+        return priceDataMap;
     }
 
-    // Метод для обработки любых других бирж
-    public void updateOtherExchangeData(String symbol, Double avgBidPrice, Double avgAskPrice,
-                                        Double bidSumUSDT, Double askSumUSDT,
-                                        Double high24h, Double low24h, Double volume24hInUSDT) {
-        // Логика для обработки данных других бирж
-        if (symbol != null) {
-            System.out.println("Other Exchange: " + symbol);
-        }
-        // Аналогичные выводы для других данных
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PriceData {
+        private String symbol;
+        private String exchange;
+        private double buyPrice;
+        private double sellPrice;
+        private double profit;
+        private double spread;
     }
 }
-
