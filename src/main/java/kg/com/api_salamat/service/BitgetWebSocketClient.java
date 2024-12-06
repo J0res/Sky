@@ -1,4 +1,4 @@
-//package kg.com.api_salamat.service;
+package kg.com.api_salamat.service;//package kg.com.api_salamat.service;
 //
 //import kg.com.api_salamat.controller.PriceController;
 //import org.java_websocket.client.WebSocketClient;

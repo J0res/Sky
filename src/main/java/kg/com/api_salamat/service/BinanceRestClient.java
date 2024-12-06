@@ -1,4 +1,4 @@
-//package kg.com.api_salamat.service;
+package kg.com.api_salamat.service;//package kg.com.api_salamat.service;
 //
 //import org.springframework.stereotype.Service;
 //import org.springframework.web.client.RestTemplate;

@@ -1,10 +1,6 @@
 package kg.com.api_salamat.service;
 
 import kg.com.api_salamat.controller.PriceController;
-import kg.com.api_salamat.service.BinanceWebSocketClient;
-import kg.com.api_salamat.service.MEXCWebSocketClient;
-import kg.com.api_salamat.service.OKXWebSocketClient;
-import kg.com.api_salamat.service.PoloniexWebSocketClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +17,7 @@ public class WebSocketConnectionRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<String> symbols = List.of("BTC-USDT", "ETH-USDT");
+        List<String> symbols = List.of("BTCUSDT", "ETHUSDT");
 
         symbols.forEach(symbol -> {
             try {
