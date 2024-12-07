@@ -37,7 +37,7 @@ public class WebSocketConnectionRunner implements CommandLineRunner {
                 String mexcSymbol = SymbolFormatter.formatSymbol("MEXC", symbol); // Обрабатываем символ
                 System.out.println("Connecting to MEXC with symbol: " + mexcSymbol);
                 new MEXCWebSocketClient(new URI("wss://wbs.mexc.com/ws"), mexcSymbol, priceController).connectBlocking();
-//
+//dasd
 //                // Poloniex
 //                String poloniexSymbol = SymbolFormatter.formatSymbol("Poloniex", symbol); // Обрабатываем символ
 //                System.out.println("Connecting to Poloniex with symbol: " + poloniexSymbol);
