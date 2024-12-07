@@ -21,22 +21,28 @@ public class MEXCWebSocketClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connected to MEXC for symbol: " + symbol);
-        send("{\"method\":\"SUBSCRIPTION\",\"params\":[\"spot@public.limit.depth.v3.api@" + symbol + "@20\"]}");
+        String subscriptionMessage = String.format("{\"method\":\"SUBSCRIPTION\",\"params\":[\"spot@public.bookTicker.v3.api@" + symbol + "\"]}");
+        send(subscriptionMessage);
     }
 
     @Override
     public void onMessage(String message) {
         JSONObject json = new JSONObject(message);
-        if (json.has("asks") && json.has("bids")) {
-            // Пример обработки данных
-            double buyPrice = json.getJSONArray("bids").getJSONObject(0).getDouble("p");
-            double sellPrice = json.getJSONArray("asks").getJSONObject(0).getDouble("p");
+
+        if (json.has("b") && json.has("a") && json.has("B") && json.has("A")) {
+            double buyPrice = json.getDouble("b");
+            double sellPrice = json.getDouble("a");
+            double buyVolume = json.getDouble("B");
+            double sellVolume = json.getDouble("A");
+
             double profit = sellPrice - buyPrice;
             double spread = (profit / buyPrice) * 100;
 
-            priceController.updateData(symbol, "MEXC", buyPrice, sellPrice, profit, spread);
+            // Обновляем данные
+            priceController.updateData(symbol, "MEXC", buyPrice, sellPrice, profit, spread, buyVolume, sellVolume);
         }
     }
+
 
     @Override
     public void onClose(int code, String reason, boolean remote) {

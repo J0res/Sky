@@ -1,6 +1,7 @@
 package kg.com.api_salamat.service;
 
 import kg.com.api_salamat.controller.PriceController;
+import kg.com.api_salamat.util.SymbolFormatter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -28,13 +29,17 @@ public class BinanceWebSocketClient extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         JSONObject json = new JSONObject(message);
-        if (json.has("b") && json.has("a")) {
+        if (json.has("b") && json.has("a") && json.has("B") && json.has("A")) {
             double buyPrice = json.getDouble("b");
             double sellPrice = json.getDouble("a");
+            double buyVolume = json.getDouble("B");
+            double sellVolume = json.getDouble("A");
+
             double profit = sellPrice - buyPrice;
             double spread = (profit / buyPrice) * 100;
 
-            priceController.updateData(symbol, "Binance", buyPrice, sellPrice, profit, spread);
+            // Обновляем данные
+            priceController.updateData(symbol, "Binance", buyPrice, sellPrice, profit, spread, buyVolume, sellVolume);
         }
     }
 

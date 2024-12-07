@@ -1,6 +1,7 @@
 package kg.com.api_salamat.service;
 
 import kg.com.api_salamat.controller.PriceController;
+import kg.com.api_salamat.util.SymbolFormatter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -32,10 +33,13 @@ public class OKXWebSocketClient extends WebSocketClient {
             JSONObject data = json.getJSONArray("data").getJSONObject(0);
             double buyPrice = data.getDouble("bidPx");
             double sellPrice = data.getDouble("askPx");
+            double buyVolume = data.getDouble("bidSz");
+            double sellVolume = data.getDouble("askSz");
             double profit = sellPrice - buyPrice;
             double spread = (profit / buyPrice) * 100;
 
-            priceController.updateData(symbol, "OKX", buyPrice, sellPrice, profit, spread);
+            // Обновляем данные
+            priceController.updateData(symbol, "OKX", buyPrice, sellPrice, profit, spread, buyVolume, sellVolume);
         }
     }
 
