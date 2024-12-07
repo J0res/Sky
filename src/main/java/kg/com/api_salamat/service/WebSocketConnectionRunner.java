@@ -1,11 +1,13 @@
 package kg.com.api_salamat.service;
 
 import kg.com.api_salamat.controller.PriceController;
+import kg.com.api_salamat.util.SymbolFormatter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.List;
+
 @Component
 public class WebSocketConnectionRunner implements CommandLineRunner {
 
@@ -21,18 +23,33 @@ public class WebSocketConnectionRunner implements CommandLineRunner {
 
         symbols.forEach(symbol -> {
             try {
-                // Подключение к MEXC
-                new MEXCWebSocketClient(new URI("wss://wbs.mexc.com/ws"), symbol, priceController).connectBlocking();
+                // OKX
+                String okxSymbol = SymbolFormatter.formatSymbol("OKX", symbol); // Обрабатываем символ
+                System.out.println("Connecting to OKX with symbol: " + okxSymbol);
+                new OKXWebSocketClient(new URI("wss://ws.okx.com:8443/ws/v5/public"), okxSymbol, priceController).connectBlocking();
 
-                // Подключение к OKX
-                new OKXWebSocketClient(new URI("wss://ws.okx.com:8443/ws/v5/public"), symbol, priceController).connectBlocking();
+                // Binance
+                String binanceSymbol = SymbolFormatter.formatSymbol("Binance", symbol); // Обрабатываем символ
+                System.out.println("Connecting to Binance with symbol: " + binanceSymbol);
+                new BinanceWebSocketClient(new URI("wss://stream.binance.com:9443/ws"), binanceSymbol, priceController).connectBlocking();
 
-                // Подключение к Poloniex
-                new PoloniexWebSocketClient(new URI("wss://ws.poloniex.com/ws/public"), symbol, priceController).connectBlocking();
+                // MEXC
+                String mexcSymbol = SymbolFormatter.formatSymbol("MEXC", symbol); // Обрабатываем символ
+                System.out.println("Connecting to MEXC with symbol: " + mexcSymbol);
+                new MEXCWebSocketClient(new URI("wss://wbs.mexc.com/ws"), mexcSymbol, priceController).connectBlocking();
+//
+//                // Poloniex
+//                String poloniexSymbol = SymbolFormatter.formatSymbol("Poloniex", symbol); // Обрабатываем символ
+//                System.out.println("Connecting to Poloniex with symbol: " + poloniexSymbol);
+//                new PoloniexWebSocketClient(new URI("https://api.poloniex.com/markets/ticker24h"), poloniexSymbol, priceController).connectBlocking();
 
-                // Подключение к Binance
-                new BinanceWebSocketClient(new URI("wss://stream.binance.com:9443/ws"), symbol, priceController).connectBlocking();
+                // Bitget
+                String bitgetSymbol = SymbolFormatter.formatSymbol("Bitget", symbol);
+                System.out.println("Connecting to Bitget with symbol: " + bitgetSymbol);
+                new BitgetWebSocketClient(new URI("wss://ws.bitget.com/v2/ws/public"), bitgetSymbol, priceController).connectBlocking();
+
             } catch (Exception e) {
+                System.err.println("Error connecting to WebSocket for symbol: " + symbol);
                 e.printStackTrace();
             }
         });

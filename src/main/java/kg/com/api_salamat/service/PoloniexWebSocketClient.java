@@ -21,22 +21,29 @@ public class PoloniexWebSocketClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         System.out.println("Connected to Poloniex for symbol: " + symbol);
-        String subscriptionMessage = String.format("{\"command\": \"subscribe\", \"channel\": \"%s\"}", symbol);
-        send(subscriptionMessage);
+        String subscriptionMessage = String.format("{\"event\": \"subscribe\", \"channel\": [\"ticker\"], \"symbols\": \"%s\"}", symbol);
+        String subscriptionMessageDepth = "{ \"event\": \"subscribe\", \"channel\": [\"book\"], \"symbols\": [\"" + symbol + "\"] }";
+        send(subscriptionMessageDepth);
     }
 
     @Override
     public void onMessage(String message) {
         JSONObject json = new JSONObject(message);
-        if (json.has("asks") && json.has("bids")) {
-            double buyPrice = json.getJSONArray("bids").getJSONArray(0).getDouble(0);
-            double sellPrice = json.getJSONArray("asks").getJSONArray(0).getDouble(0);
+        System.out.println(message);
+        if (json.has("bid") && json.has("ask") && json.has("bidQuantity") && json.has("askQuantity")) {
+            double buyPrice = json.getDouble("bids");
+            double sellPrice = json.getDouble("asks");
+            double buyVolume = json.getDouble("askQuantity");
+            double sellVolume = json.getDouble("askQuantity");
+
             double profit = sellPrice - buyPrice;
             double spread = (profit / buyPrice) * 100;
 
-            priceController.updateData(symbol, "Poloniex", buyPrice, sellPrice, profit, spread);
+            // Обновляем данные
+            priceController.updateData(symbol, "Poloniex", buyPrice, sellPrice, profit, spread, buyVolume, sellVolume);
         }
     }
+
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
